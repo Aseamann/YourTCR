@@ -22,37 +22,38 @@ DROP TABLE IF EXISTS rawPDB;
 
 
 CREATE TABLE tcrs (
-	pdbID VARCHAR() NOT NULL PRIMARY KEY
+	pdbID VARCHAR(4) NOT NULL PRIMARY KEY
 );
 
 CREATE TABLE clustered (
-	pdbID VARCHAR() NOT NULL
+	pdbID VARCHAR(4) NOT NULL
 );
 
 CREATE TABLE nonredundant (
-	pdbID VARCHAR() NOT NULL
+	pdbID VARCHAR(4) NOT NULL
 );
 
 CREATE TABLE modified (
-	user VARCHAR() NOT NULL,
-	mods VARCHAR() NOT NULL
+	user VARCHAR(100) NOT NULL,
+	mods VARCHAR(1000) NOT NULL
 );
 
 CREATE TABLE modPDB (
-	pdbID_mod VARCHAR() NOT NULL PRIMARY KEY,
-	tempID VARCHAR() NOT NULL PRIMARY KEY,
+	pdbID_mod VARCHAR(4) NOT NULL,
+	tempID VARCHAR(100) NOT NULL,
 	resolution FLOAT,
-	tcr_alpha VARCHAR(),
-	tcr_beta VARCHAR(),
-	peptide VARCHAR(),
-	mhc VARCHAR()
+	tcr_alpha CHAR(1),
+	tcr_beta CHAR(1),
+	peptide CHAR(1),
+	mhc CHAR(1),
+	PRIMARY KEY(pdbID_mod, tempID)
 );
 
 CREATE TABLE raw (
-	pdbID_raw VARCHAR() NOT NULL PRIMARY KEY,
+	pdbID_raw VARCHAR(4) NOT NULL PRIMARY KEY,
 	resolution FLOAT NOT NULL,
-        tcr_alpha VARCHAR(),
-        tcr_beta VARCHAR(),
-        peptide VARCHAR(),
-        mhc VARCHAR()
+        tcr_alpha CHAR(1),
+        tcr_beta CHAR(1),
+        peptide CHAR(1),
+        mhc CHAR(1)
 );
