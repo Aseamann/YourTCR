@@ -34,6 +34,8 @@ CREATE TABLE nonredundant (
 );
 
 CREATE TABLE modified (
+	pdbID VARCHAR(4) NOT NULL,
+	pdbID_mod VARCHAR(4) NOT NULL,
 	user VARCHAR(100) NOT NULL,
 	mods VARCHAR(1000) NOT NULL
 );
@@ -50,10 +52,17 @@ CREATE TABLE modPDB (
 );
 
 CREATE TABLE raw (
+	pdbID_raw VARCHAR(4) NOT NULL,
+	pdbID VARCHAR(4) NOT NULL
+);
+
+CREATE TABLE rawPDB (
 	pdbID_raw VARCHAR(4) NOT NULL PRIMARY KEY,
 	resolution FLOAT NOT NULL,
-        tcr_alpha CHAR(1),
-        tcr_beta CHAR(1),
-        peptide CHAR(1),
-        mhc CHAR(1)
+	tcr_alpha CHAR(1),
+	tcr_beta CHAR(1),
+	peptide CHAR(1),
+	mhc CHAR(1)
 );
+
+INSERT INTO rawPDB VALUES('1ao7', 3.0, 'D', 'E', 'C', 'A');
