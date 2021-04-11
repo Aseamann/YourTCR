@@ -1,41 +1,44 @@
-import MySQLdb
 import sys
+import os
+from PDB_Tools_V3 import PdbTools3 as tool
 
-# Connecting python to mysql
-try:
-    conn = MySQLdb.connect(
-            user="aseamann",
-            password="",
-            host="localhost",
-            port=3306)
-except MySQLdb.Error as e:
-    print(f"Error connecting to MariaDB Platform: {e}")
-    sys.exit(1)
 
-# Instantiate Cursor
-cursor = conn.cursor()
+def main():
+    # Preparing SQL query for inserting raw PDB info
+    pdb_data = {
+        'pdbID_raw': "NULL", 
+        'resolution': 3.0, 
+        'tcr_alpha': 'D', 
+        'tcr_beta': 'E', 
+        'peptide': 'C', 
+        'mhc': 'A'
+    }
 
-# Preparing SQL query for inserting raw PDB info
-insert_stmt = (
-	"INSERT INTO rawPDB( pdbID_raw, resolution, tcr_alpha, tcr_beta, peptide, mhc)"
-	"VALUES (%s, %s, %s, %s, %s, $s)"
-)
+    current_dir = os.path.dirname(os.path.realpath(__file__))
+    raw_dir = current_dir + '/public_html/rawPDBs/'
 
-data = ('1a07', 3.0, 'D', 'E', 'C', 'A')
+    with open('rawPDBinsert.sql', 'w') as f:
+        f.write('USE aseamann;\n')
+        for pdb in sorted(os.listdir(raw_dir)):
+                if pdb.endswith(".pdb"):
+                    pdb1 = tool(raw_dir + pdb)
+                    tcr_chains = pdb1.get_tcr_chains()
+                    mhc = pdb1.get_mhc_chain()
+                    peptide = pdb1.get_peptide_chain()
 
-try:
-	#Excuting the SQL command
-	cursor.execute(insert_stmt, data)
+                    pdb_data['pdbID_raw'] = pdb[:4]
+                    pdb_data['tcr_alpha'] = tcr_chains['ALPHA']
+                    pdb_data['tcr_beta'] = tcr_chains['beta']
+                    pdb_data['peptide'] = peptide
+                    pdb_data['mhc'] = mhc
+                    
+                    # writing line
+                    output = "INSERT INTO rawPDB(pdbID_raw, resolution, tcr_alpha, tcr_beta, peptide, mhc) VALUES('%(pdbID_raw)s', %(resolution)s, '%(tcr_alpha)s', '%(tcr_beta)s', '%(peptide)s', '%(mhc)s');" % pdb_data
+                    f.write(output + '\n')
+    # os.system('mysql< rawPDBinsert.sql')
 
-	#Commit your changes in the database
-	conn.commit()
-except:
-	# Rolling back in case of error
-	conn.rollback()
 
-print("Data inserted")
-
-# Closing the connection
-conn.close()
+if __name__ == '__main__':
+    main()
 
 

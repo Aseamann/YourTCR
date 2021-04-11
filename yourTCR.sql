@@ -65,4 +65,3 @@ CREATE TABLE rawPDB (
 	mhc CHAR(1)
 );
 
-INSERT INTO rawPDB VALUES('1ao7', 3.0, 'D', 'E', 'C', 'A');
