@@ -208,15 +208,17 @@ class PdbTools3:
 
     # Returns the AA chain that is the peptide of the pMHC complex, based on the smallest chain in file
     def get_peptide_chain(self):
-        self.set_record_type('SEQRES')
-        file_seqres = self.record_report().splitlines()
-        lowest = 1000
-        chain = ''
-        for line in file_seqres:
-            if int(line[7:10]) < lowest:
-                lowest = int(line[7:10])
-                chain = line[4]
-        return chain
+        chains = self.get_chains()
+        chain_dic = {}
+        length = 10000
+        peptide = ''
+        for chain in chains:
+            chain_dic[chain] = self.get_amino_acid_on_chain(chain)
+        for chain in chain_dic:
+            if len(chain_dic[chain]) < length:
+                length = len(chain_dic[chain])
+                peptide = chain
+        return peptide
 
     # Returns the MHC chain - based on COMPND section labeling HISTOCOMPATIBILITY ANTIGEN
     # WILL LATER CONVERT THIS TO HOW I CHECK FOR TCR CHAINS
