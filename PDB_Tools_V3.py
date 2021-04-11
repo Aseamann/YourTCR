@@ -206,15 +206,18 @@ class PdbTools3:
     # WILL LATER CONVERT THIS TO HOW I CHECK FOR TCR CHAINS
     # TODO Also write atoms on mhc
     def get_mhc_chain(self):
-        self.set_record_type('COMPND')
-        file = self.record_report().splitlines()
+        matrix = matlist.blosum62
+        # Hard coded mhc chain
+        mhc_chain = 'GSHSMRYFFTSVSRPGRGEPRFIAVGYVDDTQFVRFDSDAASQRMEPRAPWIEQEGPEYWDGETRKVKAHSQTHRVDLGTLRGYYNQSEAGSHTVQRMYGCDVGSDWRFLRGYHQYAYDGKDYIALKEDLRSWTAADMAAQTTKHKWEAAHVAEQLRAYLEGTCVEWLRRYLENGKETLQRTDAPKTHMTHHAVSDHEATLRCWALSFYPAEITLTWQRDGEDQTQDTELVETRPAGDGTFQKWAAVVVPSGQEQRYTCHVQHEGLPKPLTLRWE'
         chains = self.get_chains()
-        flag = False
-        for line in file:
-            if flag and line[11] in chains:
-                return line[11]
-            elif line[4:12] == 'MOLECULE' and line.__contains__('HISTOCOMPATIBILITY ANTIGEN'):
-                flag = True
+        tmp_mhc = []
+        for chain in chains:
+            score_mhc = pairwise2.align.globaldx(
+                self.get_amino_acid_on_chain(chain), mhc_chain, matrix,
+                score_only=True, penalize_end_gaps=(False, False))
+            tmp_mhc.append([float(score_mhc), chain])
+        mhc = sorted(tmp_mhc)
+        return mhc[-1][1]
 
     def renumber_docking(self, rename="****"):
         if rename != '****':  # Renames if given input, if not writes over file
