@@ -32,6 +32,22 @@ class PdbTools3:
                     if not chains.__contains__(line[21]):
                         chains.append(line[21])
         return chains
+    
+    def get_resolution(self):
+        value = ''
+        output = -1
+        with open(self.file_name, 'r') as file:
+            flag = False
+            for line in file:
+                if line[0:6] == 'REMARK' and not flag:
+                    temp = line[6:10]
+                    if temp == '   2':
+                        flag = True
+                elif line[0:6] == 'REMARK' and flag:
+                    value += line[26:29]
+                    break
+        output = float(value)
+        return output
 
     # Returns a string of amino acids in a specific chain as a string in single letter notation
     def get_amino_acid_on_chain(self, chain):
