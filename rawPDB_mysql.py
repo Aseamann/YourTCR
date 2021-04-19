@@ -22,13 +22,15 @@ def main():
         for pdb in sorted(os.listdir(raw_dir)):
                 if pdb.endswith(".pdb"):
                     pdb1 = tool(raw_dir + pdb)
+                    resolution = pdb1.get_resolution()
                     tcr_chains = pdb1.get_tcr_chains()
                     mhc = pdb1.get_mhc_chain()
                     peptide = pdb1.get_peptide_chain()
 
                     pdb_data['pdbID_raw'] = pdb[:4]
+                    pdb_data['resolution'] = resolution
                     pdb_data['tcr_alpha'] = tcr_chains['ALPHA']
-                    pdb_data['tcr_beta'] = tcr_chains['beta']
+                    pdb_data['tcr_beta'] = tcr_chains['BETA']
                     pdb_data['peptide'] = peptide
                     pdb_data['mhc'] = mhc
                     
