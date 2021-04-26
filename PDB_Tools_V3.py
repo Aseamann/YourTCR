@@ -276,9 +276,23 @@ class PdbTools3:
                         f1.write(line + '\n')
             f1.write("END\n")
 
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("pdb", help="Full crystal structure", type=str)
+    parser.add_argument("--relabel", help="Update labeling to MHC=A, b2=B, peptide=C, alpha=D, beta=E", 
+            default=False, action="store_true")
+    parser.add_argument("--renum", help="Updates numbering of TCR for docking", default=False, action="store_true")
+    parser.add_argument("--trim", help="Trim TCR chains to only contain variable region", default=False,
+            action="store_true")
+    parser.add_argument("--tcr", help="Only provide TCR chains", default=False, action"store_true")
+    return parser.parse_args()
+
+def main():
+    pdb = PdbTools3(args.pdb)
+    if args.relabel:
+        print("help")
 
 if __name__ == '__main__':
-    pdb = PdbTools3("Docking/franSession_trimmed.pdb")
-    pdb.renumber_docking("Docking/test.pdb")
+    main()
 
 
