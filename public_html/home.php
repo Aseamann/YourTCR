@@ -38,7 +38,7 @@
 		$username="aseamann";
 		$password="";
 		$database="aseamann";
-		
+
 		$connect = mysqli_connect($server,$username,"",$database);
 
 		/* Sets up body of page */
@@ -82,12 +82,13 @@
 						});
 					}
 				</script>";
-		
+		}
+
 		/* Run a basic SQL query and throw
 		 * an error if its unable to perform the query
 		 */
 		$query = "SELECT pdbID_raw FROM rawPDB";
-		$result = mysqli_query($connect, $query) 
+		$result = mysqli_query($connect, $query)
 			  or trigger_error("Query Failed! SQL: $query - Error: "
 			  . mysqli_error($connect), E_USER_ERROR);
 		if($result = mysqli_query($connect, $query)){
@@ -99,7 +100,7 @@
 		}
 		$select.='</select>';
 		echo $select;
-		
+
 		/*Return file of PDB selected else print error*/
 		if ($result = mysqli_query($connect, $query)) {
 		    while ($row = mysqli_fetch_row($result)) {
@@ -110,12 +111,11 @@
 		}else{
 			echo "No results";
 		}
-		
-		/*Always close your connection. 
+
+		/*Always close your connection.
 		 * Its a courtesy to your fellow users.
 		 */
 		mysqli_close($connect);
 		?>
 	</body>
 </html>
-

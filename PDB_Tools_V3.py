@@ -1,6 +1,12 @@
 from math import sqrt
 from Bio import pairwise2
-from Bio.SubsMat import MatrixInfo as matlist
+import warnings
+from Bio import BiopythonDeprecationWarning
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore", BiopythonDeprecationWarning)
+    from Bio.SubsMat import MatrixInfo as matlist
+import argparse
+
 
 
 class PdbTools3:
@@ -32,10 +38,9 @@ class PdbTools3:
                     if not chains.__contains__(line[21]):
                         chains.append(line[21])
         return chains
-    
+
     def get_resolution(self):
         value = ''
-        output = -1
         with open(self.file_name, 'r') as file:
             flag = False
             for line in file:
@@ -106,7 +111,8 @@ class PdbTools3:
             for line in file:
                 if line[0:6] == 'ATOM  ':
                     if int(line[6:11]) == atom_num and len(line) >= 76:
-                        atom = {'atom_num': int(line[6:11]), 'atom_id': line[13:16].strip(), 'atom_comp_id': line[17:20],
+                        atom = {'atom_num': int(line[6:11]), 'atom_id': line[13:16].strip(),
+                                'atom_comp_id': line[17:20],
                                 'chain_id': line[21], 'comp_num': int(line[22:26]), 'X': float(line[31:38]),
                                 'Y': float(line[38:46]), 'Z': float(line[46:54]), 'occupancy': float(line[55:60]),
                                 'B_iso_or_equiv': float(line[60:66]), 'atom_type': line[77]}
@@ -122,8 +128,8 @@ class PdbTools3:
     def euclidean_of_atoms(self, atom_num_1, atom_num_2):
         atom_1 = self.get_atom(atom_num_1)
         atom_2 = self.get_atom(atom_num_2)
-        euclidean_distance = sqrt((atom_2['X'] - atom_1['X'])**2 + (atom_2['Y'] - atom_1['Y'])**2
-                                  + (atom_2['Z'] - atom_1['Z'])**2)
+        euclidean_distance = sqrt((atom_2['X'] - atom_1['X']) ** 2 + (atom_2['Y'] - atom_1['Y']) ** 2
+                                  + (atom_2['Z'] - atom_1['Z']) ** 2)
         return euclidean_distance
 
     def get_atoms_on_chain(self, chain):
@@ -133,15 +139,16 @@ class PdbTools3:
                 if line[0:6] == 'ATOM  ':
                     if line[21] == chain.upper() and len(line) >= 76:
                         atoms.append({'atom_num': int(line[6:11]), 'atom_id': line[13:16].strip(),
-                                'atom_comp_id': line[17:20],
-                                'chain_id': line[21], 'comp_num': int(line[22:26]), 'X': float(line[31:38]),
-                                'Y': float(line[38:46]), 'Z': float(line[46:54]), 'occupancy': float(line[55:60]),
-                                'B_iso_or_equiv': float(line[60:66]), 'atom_type': line[77]})
+                                      'atom_comp_id': line[17:20],
+                                      'chain_id': line[21], 'comp_num': int(line[22:26]), 'X': float(line[31:38]),
+                                      'Y': float(line[38:46]), 'Z': float(line[46:54]), 'occupancy': float(line[55:60]),
+                                      'B_iso_or_equiv': float(line[60:66]), 'atom_type': line[77]})
                     elif line[21] == chain.upper() and len(line) >= 76:
                         atoms.append({'atom_num': int(line[6:11]), 'atom_id': line[13:16].strip(),
-                                'atom_comp_id': line[17:20],
-                                'chain_id': line[21], 'comp_num': int(line[22:26]), 'X': float(line[31:38]),
-                                'Y': float(line[38:46]), 'Z': float(line[46:54]), 'occupancy': float(line[55:60])})
+                                      'atom_comp_id': line[17:20],
+                                      'chain_id': line[21], 'comp_num': int(line[22:26]), 'X': float(line[31:38]),
+                                      'Y': float(line[38:46]), 'Z': float(line[46:54]),
+                                      'occupancy': float(line[55:60])})
         return atoms
 
     # Returns alpha and beta chain IDs based on seq. alignment to 1a07 PDB entry chains. Confirms that it is a
@@ -160,9 +167,11 @@ class PdbTools3:
         tmp_alpha = []
         tmp_beta = []
         for chain in chains:
-            score_alpha = pairwise2.align.globaldx(self.get_amino_acid_on_chain(chain), alpha_chain[0], matrix, score_only=True, penalize_end_gaps=(False, False))
+            score_alpha = pairwise2.align.globaldx(self.get_amino_acid_on_chain(chain), alpha_chain[0], matrix,
+                                                   score_only=True, penalize_end_gaps=(False, False))
             tmp_alpha.append([float(score_alpha), chain])
-            score_beta = pairwise2.align.globaldx(self.get_amino_acid_on_chain(chain), beta_chain[0], matrix, score_only=True, penalize_end_gaps=(False, False))
+            score_beta = pairwise2.align.globaldx(self.get_amino_acid_on_chain(chain), beta_chain[0], matrix,
+                                                  score_only=True, penalize_end_gaps=(False, False))
             tmp_beta.append([float(score_beta), chain])
         alpha = sorted(tmp_alpha)
         beta = sorted(tmp_beta)
@@ -172,9 +181,12 @@ class PdbTools3:
         position = -1
         while True:
             atom2 = self.first_atom_on_chain(result['BETA'])
-            distance1 = self.euclidean_of_atoms(atom['atom_num'], atom2['atom_num'])  # Distance between 1st atom in each chain
-            distance2 = self.euclidean_of_atoms(atom['atom_num'], atom2['atom_num'] + 125)  # Distance between 1st and 125 atoms in each chain
-            if distance1 <= 46 and abs(distance1 - distance2) <= 15:  # Determines if TCR chains are within typical distance.
+            distance1 = self.euclidean_of_atoms(atom['atom_num'],
+                                                atom2['atom_num'])  # Distance between 1st atom in each chain
+            distance2 = self.euclidean_of_atoms(atom['atom_num'], atom2[
+                'atom_num'] + 125)  # Distance between 1st and 125 atoms in each chain
+            if distance1 <= 46 and abs(
+                    distance1 - distance2) <= 15:  # Determines if TCR chains are within typical distance.
                 self.test_list[self.get_file_name()] = abs(distance1 - distance2)
                 result['BETA'] = beta[position][1]
                 break
@@ -196,15 +208,8 @@ class PdbTools3:
 
     # Returns the atoms on the peptide, peptide is determined by smallest chain
     def get_atoms_on_peptide(self):
-        atoms = []
-        self.set_record_type('ATOM')
-        file_atoms = self.record_report().splitlines()
         chain = self.get_peptide_chain()
-        for line in file_atoms:
-            if line[15] == chain:
-                atoms.append(self.get_atom(int(line[0:5])))
-        atoms.pop(len(atoms) - 1)
-        return atoms
+        return self.get_atoms_on_chain(chain)
 
     # Returns the AA chain that is the peptide of the pMHC complex, based on the smallest chain in file
     def get_peptide_chain(self):
@@ -243,7 +248,6 @@ class PdbTools3:
         else:
             tcr = self.file_name
         tcr_list = self.get_tcr_chains()
-        print(tcr_list)
         atom_count = 1
         res_count = 1
         previous_res_count = 0
@@ -276,23 +280,296 @@ class PdbTools3:
                         f1.write(line + '\n')
             f1.write("END\n")
 
+    # Returns a reformatted PDB with just the TCR atom cord. and has relabeled chains with ALPHA = A; BETA = B
+    def clean_tcr(self, dir_start='****'):
+        if dir_start != '****':
+            tcr = dir_start + '%s_tcr.pdb' % (self.get_pdb_id())
+        else:
+            tcr = '%s.pdb' % (self.get_pdb_id())
+        tcr_list = self.get_tcr_chains()
+        atom_count = 0
+        flag = False
+        output = []
+        with open(self.file_name) as f:
+            for line in f:
+                if line[0:6] == 'HEADER':
+                    output.append(line)
+                    flag = True
+                if flag:
+                    output.append('EXPDTA    THEORETICAL MODEL    CLEAN TCR ALPHA:A BETA:B\n')
+                    flag = False
+                if line[0:6] == 'ATOM  ' or line[0:6] == 'TER   ':
+                    if line[16] != 'B':
+                        if line[21] == tcr_list.get('ALPHA') or line[21] == tcr_list.get('BETA'):
+                            if line[21] == tcr_list.get('ALPHA'):
+                                line = line[:21] + 'A' + line[22:]
+                            elif line[21] == tcr_list.get('BETA'):
+                                line = line[:21] + 'B' + line[22:]
+                            num = line[6:11]
+                            atom_count += 1
+                            if line[16] == 'A':
+                                line = line[:16] + ' ' + line[17:]
+                            output.append(line.replace(num, str(atom_count).rjust(5), 1))
+        with open(tcr, 'w+') as f1:
+            for line in output:
+                f1.write(line + "\n")
+
+    # Returns a reformatted PDB with just the TCR atom cord. and has relabeled chains with ALPHA = A; BETA = B
+    # Also uses trimmed TCR seq.
+    # New count on amino acids so each chain starts at 1
+    def clean_tcr_count_trim(self, dir_start='****'):
+        if dir_start != '****':
+            tcr = dir_start + '%s_tcr.pdb' % (self.get_pdb_id())
+        else:
+            tcr = self.get_pdb_id() + ".pdb"
+        tcr_list = self.get_tcr_chains()
+        atom_count = 0
+        flag = False
+        flag_a = False
+        flag_b = False
+        res_alpha_count = 1
+        alpha_cut = 107
+        res_beta_count = 1
+        beta_cut = 113
+        previous_count_a = -1
+        previous_count_b = -1
+        res_count = 0
+        output = []
+        with open(self.file_name) as f:
+            for line in f:
+                if line[0:6] == 'HEADER':
+                    output.append(line)
+                    flag = True
+                if flag:
+                    output.append('EXPDTA    THEORETICAL MODEL    CLEAN TCR ALPHA:A BETA:B\n')
+                    flag = False
+                if line[0:6] == 'ATOM  ' or line[0:6] == 'TER   ':  # Only write over atoms
+                    if line[16] != 'B' and line[26] == ' ':  # Don't allow secondary atoms
+                        if line[21] == tcr_list.get('ALPHA') or line[21] == tcr_list.get('BETA'):
+                            if line[21] == tcr_list.get('ALPHA') and res_alpha_count <= alpha_cut:
+                                if int(line[22:26]) != previous_count_a and not flag_a:
+                                    previous_count_a = int(line[22:26])
+                                    flag_a = True
+                                elif int(line[22:26]) != previous_count_a and flag_a:
+                                    previous_count_a = int(line[22:26])
+                                    res_alpha_count += 1
+                                line = line[:21] + 'A' + line[22:]
+                                line = line[:22] + str(res_alpha_count).rjust(4) + line[26:]
+                                num = line[6:11]
+                                atom_count += 1
+                                if line[16] == 'A':
+                                    line = line[:16] + ' ' + line[17:]
+                                if res_alpha_count <= alpha_cut:
+                                    output.append(line.replace(num, str(atom_count).rjust(5), 1))
+                            elif line[21] == tcr_list.get('BETA') and res_beta_count <= beta_cut:
+                                if int(line[22:26]) != previous_count_b and not flag_b:
+                                    previous_count_b = int(line[22:26])
+                                    flag_b = True
+                                elif int(line[22:26]) != previous_count_b and flag_b:
+                                    previous_count_b = int(line[22:26])
+                                    res_beta_count += 1
+                                line = line[:21] + 'B' + line[22:]
+                                line = line[:22] + str(res_beta_count).rjust(4) + line[26:]
+                                num = line[6:11]
+                                atom_count += 1
+                                if line[16] == 'A':
+                                    line = line[:16] + ' ' + line[17:]
+                                if res_beta_count <= beta_cut:
+                                    output.append(line.replace(num, str(atom_count).rjust(5), 1))
+        with open(tcr, 'w+') as f1:
+            for line in output:
+                f1.write(line + '\n')
+
+    # Creates a new PDB file with information for only the MHC of the original PDB file
+    def split_mhc(self):
+        tcr = self.get_pdb_id() + ".pdb"
+        mhc = self.get_mhc_chain()
+        helix_count = 0
+        sheet_count = 0
+        atom_count = 0
+        compare_conect = {}
+        output = []
+        with open(self.file_name) as f:
+            for line in f:
+                left_conect = 6
+                right_conect = 11
+                if line[0:6] == 'ATOM  ' or line[0:6] == 'TER   ':
+                    if line[21] == mhc:
+                        num = line[6:11]
+                        atom_count += 1
+                        output.append(line.replace(num, str(atom_count).rjust(5), 1))
+                        compare_conect[num] = atom_count
+                elif line[0:6] == 'HELIX ':
+                    if line[19] == mhc:
+                        num = line[6:10]
+                        helix_count += 1
+                        output.append(line.replace(num, str(helix_count).rjust(4), 1))
+                elif line[0:6] == 'SHEET ':
+                    if line[21] == mhc:
+                        num = line[6:10]
+                        sheet_count += 1
+                        output.append(line.replace(num, str(sheet_count).rjust(4), 1))
+                elif line[0:6] == 'HETATM':
+                    if line[21] == mhc:
+                        num = line[6:11]
+                        atom_count += 1
+                        output.append(line.replace(num, str(atom_count).rjust(5), 1))
+                elif line[0:6] == 'CONECT':
+                    if compare_conect.__contains__(line[left_conect:right_conect]):
+                        while compare_conect.__contains__(line[left_conect:right_conect]):
+                            line_update = line.replace(line[left_conect:right_conect]
+                                                       ,
+                                                       str(compare_conect[line[
+                                                                          left_conect:right_conect]]).rjust(
+                                                           5),
+                                                       1)
+                            left_conect += 5
+                            right_conect += 5
+                        output.append(line_update)
+                else:
+                    if line[0:6] != 'MASTER':
+                        output.append(line)
+        with open(tcr, 'w+') as f1:
+            for line in output:
+                f1.write(line + "\n")
+
+    # Creates a new PDB file with information for only the peptide of the original PDB file
+    def split_p(self):
+        tcr = '%s.pdb' % (self.get_pdb_id())
+        peptide = self.get_peptide_chain()
+        helix_count = 0
+        sheet_count = 0
+        atom_count = 0
+        compare_conect = {}
+        output = []
+        with open(self.file_name) as f:
+            for line in f:
+                left_conect = 6
+                right_conect = 11
+                if line[0:6] == 'ATOM  ' or line[0:6] == 'TER   ':
+                    if line[21] == peptide:
+                        num = line[6:11]
+                        atom_count += 1
+                        output.append(line.replace(num, str(atom_count).rjust(5), 1))
+                        compare_conect[num] = atom_count
+                elif line[0:6] == 'HELIX ':
+                    if line[19] == peptide:
+                        num = line[6:10]
+                        helix_count += 1
+                        output.append(line.replace(num, str(helix_count).rjust(4), 1))
+                elif line[0:6] == 'SHEET ':
+                    if line[21] == peptide:
+                        num = line[6:10]
+                        sheet_count += 1
+                        output.append(line.replace(num, str(sheet_count).rjust(4), 1))
+                elif line[0:6] == 'HETATM':
+                    if line[21] == peptide:
+                        num = line[6:11]
+                        atom_count += 1
+                        output.append(line.replace(num, str(atom_count).rjust(5), 1))
+                elif line[0:6] == 'CONECT':
+                    if compare_conect.__contains__(line[left_conect:right_conect]):
+                        while compare_conect.__contains__(line[left_conect:right_conect]):
+                            line_update = line.replace(line[left_conect:right_conect]
+                                                       ,
+                                                       str(compare_conect[line[left_conect:right_conect]]).rjust(5),
+                                                       1)
+                            left_conect += 5
+                            right_conect += 5
+                        output.append(line_update)
+                else:
+                    if line[0:6] != 'MASTER':
+                        output.append(line)
+        with open(tcr, 'w+') as f1:
+            for line in output:
+                f1.write(line + '\n')
+
+    def clean_docking_count(self, rename='****'):
+        POSSEQ = [22, 26]
+        POSCHAIN = 21
+        ANUM = [6, 11]
+        CHAINID = 21
+
+        if rename != '****':
+            pdb_1 = rename
+        else:
+            pdb_1 = self.pdb  # Default naming if no input
+        atom_count = 1  # Keeps track of atom number
+        old_res_count = -10000
+        res_count = 0  # Keeps track of residue number
+        chains = []  # Chains to keep track of previous
+        header = False  # Marks down header
+        with open(self.pdb, "r") as i:
+            with open(pdb_1, 'w+') as o:
+                for line in i:
+                    if line[0:6] == 'HEADER':
+                        o.write(line)
+                        header = True  # Marks header
+                    if header:
+                        o.write('EXPDTA    DOCKING MODEL           RENUMBERED\n')
+                        header = False  # Marks EXPDTA
+                    if line[0:6] == 'ATOM  ':  # Only writes over atoms
+                        if line[16] != 'B' and line[26] == ' ':  # Don't allow secondary atoms
+                            temp_num = line[ANUM[0]:ANUM[1]]  # Saves temp old atom count
+                            temp_res = int(line[POSSEQ[0]:POSSEQ[1]])  # Saves temp old res count
+                            if len(chains) == 0:
+                                chains.append(line[CHAINID])
+                            elif line[CHAINID] != chains[-1]:  # Catches when a new chain starts
+                                chains.append(line[CHAINID])
+                                o.write('TER\n')
+                            if temp_res != old_res_count:  # Increases residue count
+                                old_res_count = int(line[POSSEQ[0]:POSSEQ[1]])
+                                res_count += 1
+                            # Replaces atom count
+                            line = line.replace(temp_num, str(atom_count).rjust(5), 1)
+                            atom_count += 1
+                            # Replaces residue count on line
+                            line = line[:22] + str(res_count).rjust(4) + line[26:]
+                            o.write(line)
+                o.write('TER\nEND\n')
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("pdb", help="Full crystal structure", type=str)
-    parser.add_argument("--relabel", help="Update labeling to MHC=A, b2=B, peptide=C, alpha=D, beta=E", 
-            default=False, action="store_true")
     parser.add_argument("--renum", help="Updates numbering of TCR for docking", default=False, action="store_true")
     parser.add_argument("--trim", help="Trim TCR chains to only contain variable region", default=False,
-            action="store_true")
-    parser.add_argument("--tcr", help="Only provide TCR chains", default=False, action"store_true")
+                        action="store_true")
+    parser.add_argument("--mhc_split", help="Only provide MHC chains", default=False, action="store_true")
+    parser.add_argument("--peptide_split", help="Only provide MHC chains", default=False, action="store_true")
+    parser.add_argument("--tcr_split", help="Only provide TCR chains", default=False, action="store_true")
+    parser.add_argument("--peptide", help="Get peptide chain", default=False, action="store_true")
+    parser.add_argument("--mhc", help="Get mhc chain", default=False, action="store_true")
+    parser.add_argument("--alpha", help="Get alpha chain", default=False, action="store_true")
+    parser.add_argument("--beta", help="Get beta chain", default=False, action="store_true")
+    parser.add_argument("--resolution", help="Get resolution", default=False, action="store_true")
     return parser.parse_args()
 
+
 def main():
+    args = parse_args()
     pdb = PdbTools3(args.pdb)
-    if args.relabel:
-        print("help")
+    if args.mhc_split:
+        pdb.split_mhc()
+    if args.trim:
+        pdb.clean_tcr_count_trim()
+    if args.tcr_split:
+        pdb.clean_tcr()
+    if args.peptide_split:
+        pdb.split_p()
+    if args.renum:
+        pdb.clean_docking_count()
+    if args.peptide:
+        print(pdb.get_peptide_chain())
+    if args.mhc:
+        print(pdb.get_mhc_chain())
+    if args.alpha:
+        print(pdb.get_tcr_chains()['ALPHA'])
+    if args.beta:
+        print(pdb.get_tcr_chains()['BETA'])
+    if args.resolution:
+        print(pdb.get_resolution())
+
 
 if __name__ == '__main__':
     main()
-
-
