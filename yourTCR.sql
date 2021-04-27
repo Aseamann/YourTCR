@@ -41,13 +41,14 @@ CREATE TABLE modified (
 );
 
 CREATE TABLE modPDB (
-	pdbID_mod VARCHAR(4) NOT NULL,
+	pdbID_mod VARCHAR(8) NOT NULL,
 	tempID VARCHAR(100) NOT NULL,
-	resolution FLOAT,
-	tcr_alpha CHAR(1),
-	tcr_beta CHAR(1),
-	peptide CHAR(1),
-	mhc CHAR(1),
+	all_chains  BOOLEAN,
+	trimmed  BOOLEAN,
+	tcr_only BOOLEAN,
+	p_only BOOLEAN,
+	mhc_only BOOLEAN
+	renum BOOLEAN,
 	PRIMARY KEY(pdbID_mod, tempID)
 );
 
