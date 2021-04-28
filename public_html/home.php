@@ -29,6 +29,28 @@
 			display: none;
 			overflow: hidden;
 		}
+		.container {
+			width: 80%;
+			margin: 0 auto;
+		}
+		header {
+			background: #E0823cc;
+		}
+		nav ul {
+			list-style: none;
+		}
+		nav li {
+			display: inline-block;
+			margin-left: 70px;
+		}
+		nav a {
+			color: #444;
+			text-decoration: none;
+			text-transform: uppercase;
+		}
+		nav a:hover {
+			color: #000;
+		}
 		</style>
 	</head>
 	<body>
@@ -46,7 +68,17 @@
 			echo "Something has gone terribly wrong";
 			echo "Connection error:" .$connect->connect_error;
 		}else{
-			echo "<h1>YourTCR</h1>";
+			// Start of header
+			echo "<header>";
+				echo "<div class='container'>";
+				echo "<h1>YourTCR</h1>";
+				echo "<nav>";
+					echo "<ul>";
+						echo "<li>Home</li>";
+						echo "<li><a href='tcrinfo.php'>TCR Info</a></li>";
+					echo "</ul>";
+				echo "</nav>";
+			echo "</header>";
 			/* Start of Accordion*/
 			echo "<button class='accordion'>Get Specific TCR</button>
 				<div class='panel'>";
@@ -89,7 +121,6 @@
 					// Accordion Panel 3
 					echo '<br>';
 					echo "<form method='post' id='advance'i action =''>";
-						// Dropdown menu
 						$query = "SELECT pdbID_raw FROM rawPDB";
 						$result = mysqli_query($connect, $query);
 						echo '<label for="modname"> Select PDB id: </label>';
@@ -99,7 +130,7 @@
 						}
 						echo "</select><br>";
 						// Start of options
-						// value = parameter for run_mod.py
+						// Value = parameter for run_mod.py
 						echo '<input type="checkbox" id="renum" value="--renum"> Renumber <br>';
 						echo '<input type="radio" id="all_chains" value="" name="run"> All Chains ';
 						echo '<input type="radio" id="trimmed" value="--trim" name="run"> Trimmed TCR Only ';
@@ -110,7 +141,7 @@
 					echo "</form>";
 					echo '<br>';
 					// Attempting to capture from Javascript in the form of the cookie
-					// My goal however was to do it without refreshing the page as the accrodion closes
+					// My goal however was to do it without refreshing the page as the accordion closes
 					echo $_Cookie;
 				echo "</div>";
 				echo "<script>
@@ -134,7 +165,7 @@
 						if (d =='PDB') return ;
 						window.location = 'http://odin.unomaha.edu/~aseamann/' + d;
 					}
-					// Script for pulling from Panel 3 form without refreshing the page
+					// Script for pulling from Panel 3 form wihtout refreshing the page
 					function runMod() {
 						// Holds options from form
 						var results = [];
@@ -160,7 +191,7 @@
 								}
 							}
 						}
-						// Creating statement to send to be exectuted
+						// Creating statement to send to be exectured
 						mod_exec = 'python3 /home/aseamann/public_html/python_help/run_mod.py --rawPDB ' + modname;
 						mod_exec += ' --modPDB ' + '0000';
 						for (each of results) {
