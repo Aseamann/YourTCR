@@ -47,7 +47,7 @@ CREATE TABLE modPDB (
 	trimmed  BOOLEAN,
 	tcr_only BOOLEAN,
 	p_only BOOLEAN,
-	mhc_only BOOLEAN
+	mhc_only BOOLEAN,
 	renum BOOLEAN,
 	PRIMARY KEY(pdbID_mod, tempID)
 );

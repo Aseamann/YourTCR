@@ -34,14 +34,32 @@
 			margin: 0 auto;
 		}
 		header {
-			background: #E0823cc;
+			background: #55d6aa;
+		}
+		header::after {
+			content: '';
+			display: table;
+			clear: both;
+		}
+		.logo {
+			float: left;
+			margin: 0;
+			padding: 10px 0;
+		}
+		nav {
+			float: right;
 		}
 		nav ul {
+			margin: 0;
+			padding: 0;
 			list-style: none;
 		}
 		nav li {
 			display: inline-block;
-			margin-left: 70px;
+			margin-left: 40px;
+			padding-top: 25px;
+			
+			position: relative;
 		}
 		nav a {
 			color: #444;
@@ -50,6 +68,19 @@
 		}
 		nav a:hover {
 			color: #000;
+		}
+		nav a::before {
+			content: '';
+			display: block;
+			height: 5px;
+			width: 100%;
+			background-color: #444;
+			position: absolute;
+			top: 0;
+			width: 0%;
+		}
+		nav a:hover::before {
+			width: 100%;
 		}
 		</style>
 	</head>
@@ -71,11 +102,12 @@
 			// Start of header
 			echo "<header>";
 				echo "<div class='container'>";
-				echo "<h1>YourTCR</h1>";
+				echo "<h1 alt='logo' class='logo'>YourTCR</h1>";
 				echo "<nav>";
 					echo "<ul>";
-						echo "<li>Home</li>";
+						echo "<li><a>HOME</a></li>";
 						echo "<li><a href='tcrinfo.php'>TCR Info</a></li>";
+						echo "<li><a href='cluster.php'>Clusters</a></li>";
 					echo "</ul>";
 				echo "</nav>";
 			echo "</header>";
@@ -125,6 +157,7 @@
 						$result = mysqli_query($connect, $query);
 						echo '<label for="modname"> Select PDB id: </label>';
 						echo '<select name="modname" id="pdbid_mod">';
+							echo "<option value='3gsn'>3gsn</option>";
 						while($row = mysqli_fetch_row($result)) {
 							echo "<option value='".$row[0]."'>".$row[0]."</option>";
 						}
@@ -140,9 +173,9 @@
 						echo '<br><br><input type="button" name="download" value="Download" onclick="runMod()" class="grey-btn">';
 					echo "</form>";
 					echo '<br>';
+					//$mod_pdb_run = exec(runMod());
 					// Attempting to capture from Javascript in the form of the cookie
 					// My goal however was to do it without refreshing the page as the accordion closes
-					echo $_Cookie;
 				echo "</div>";
 				echo "<script>
 					// Accordion script
@@ -197,9 +230,20 @@
 						for (each of results) {
 							mod_exec += ' ' + each;
 						}
+
+						const XHR = new XMLHttpRequest();
+						
+						XHR.open('POST', 'http://odin.unomaha.edu/~aseamann/modpdb.php', true);
+						XHR.setRequestHeader('Content-type', 'utf-8');
+						
+						XHR.send(mod_exec);
+						XHR.onload = () => {
+							const pdb = XHR.response;
+							console.log(pdb);						
+						};
+						//XHR.send();
 						// Trying to return mod_exec to PHP to run on server
 						console.log(mod_exec);
-						createCookie(mod_exec);
 					}
 					// Creates a cookie
 					function createCookie(value) {

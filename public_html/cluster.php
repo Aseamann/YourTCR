@@ -95,8 +95,8 @@
 				echo "<nav>";
 					echo "<ul>";
 						echo "<li><a href='home.php'>Home</a></li>";
-						echo "<li><a>TCR Info</a></li>";
-						echo "<li><a href='cluster.php'>Clusters</a></li>";
+						echo "<li><a href='tcrinfo.php'>TCR Info</a></li>";
+						echo "<li><a>Clusters</a></li>";
 					echo "</ul>";
 				echo "</nav>";
 			echo "</header>";

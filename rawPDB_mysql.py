@@ -38,7 +38,7 @@ def main():
                     output = "INSERT INTO rawPDB(pdbID_raw, resolution, tcr_alpha, tcr_beta, peptide, mhc) " \
                         "VALUES('%(pdbID_raw)s', %(resolution)s, '%(tcr_alpha)s', '%(tcr_beta)s', '%(peptide)s', '%(mhc)s');" % pdb_data
                     f.write(output + '\n')
-    # os.system('mysql< rawPDBinsert.sql')
+    os.system('mysql< rawPDBinsert.sql')
 
 
 if __name__ == '__main__':
