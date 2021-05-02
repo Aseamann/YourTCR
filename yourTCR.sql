@@ -32,7 +32,7 @@ CREATE TABLE clustered (
 	pdbID VARCHAR(4)
 );
 
-CREATE TABLE tcr2raw {
+CREATE TABLE tcr2mod {
 	modID INT NOT NULL,
 	pdbID_mod VARCHAR(8) NOT NULL,
 	tempID int NOT NULL
