@@ -528,6 +528,26 @@ class PdbTools3:
                             o.write(line)
                 o.write('TER\nEND\n')
 
+    # Appends to a fasta formatted file of PDB file submitted.
+    # Adds sequence of alpha then beta chain
+    def fasta_TCR(self, file_name='result.fasta'):
+        tcr_alpha_chain = self.get_amino_acid_on_chain(self.get_tcr_chains()['ALPHA'])
+        tcr_beta_chain = self.get_amino_acid_on_chain(self.get_tcr_chains()['BETA'])
+        total_chain = tcr_alpha_chain + tcr_beta_chain
+        pdb_id = self.get_pdb_id()
+        count_1 = 1
+        with open(file_name, 'a+') as f:
+            if tcr_alpha_chain != '' or tcr_beta_chain != '':
+                f.write('>' + pdb_id + '\n')
+                for aa in total_chain:
+                    if count_1 % 81 != 0:
+                        f.write(aa)
+                        count_1 += 1
+                    else:
+                        f.write('\n' + aa)
+                        count_1 = 2
+                f.write('\n')
+
 
 def parse_args():
     parser = argparse.ArgumentParser()
