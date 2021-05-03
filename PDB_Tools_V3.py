@@ -1,3 +1,14 @@
+# Name: Austin Seamann
+# EMAIL: aseamann@unomaha.edu
+# Class: BIOI 4870/CSCI 8876, Spring 2021
+#
+# Honor Pledge: On my honor as a student of the University of Neraska at
+# Omaha, I have neither given nor received unauthorized help on
+# this programming assignment.
+#
+# Partners: NONE
+#
+# Sources: NONE
 from math import sqrt
 from Bio import pairwise2
 import warnings

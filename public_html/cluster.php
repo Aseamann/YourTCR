@@ -71,10 +71,40 @@
 			nav a:hover::before {
 				width: 100%;
 			}
+			body {
+				text-align: center;
+			}
+			form {
+				display: inline-block;
+			}
 		</style>
 	</head>
 	<body>
+		<header>
+			<div class='container'>
+			<h1 alt='logo' class='logo'>YourTCR</h1>
+			<nav>
+				<ul>
+					<li><a href='home.php'>Home</a></li>
+					<li><a href='tcrinfo.php'>TCR Info</a></li>
+					<li><a>Clusters</a></li>
+				</ul>
+			</nav>
+		</header><br>
+		<form method="post" action="<?php echo $_SERVER['PHP_SELF'];?>">
+			Percent Similiarity: <select name='percent' id='percent'>
+				<option value=99>99</option>
+				<option value=90>90</option>
+				<option value=80>80</option>
+				<option value=70>70</option>
+			</select>
+			<input type="submit">
+		</form><br>
 		<?php
+		$percent = 99;  // Default percent
+		if ($_SERVER["REQUEST_METHOD"] == "POST") {
+			$percent = $_POST['percent'];
+		}
 		// Connect to database
 		$server="localhost";
 		$username="aseamann";
@@ -88,40 +118,22 @@
 			echo "Something has gone terribly wrong";
 			echo "Connection error:" .$connect->connect_error;
 		}else{
-			// Header
-			echo "<header>";
-				echo "<div class='container'>";
-				echo "<h1 alt='logo' class='logo'>YourTCR</h1>";
-				echo "<nav>";
-					echo "<ul>";
-						echo "<li><a href='home.php'>Home</a></li>";
-						echo "<li><a href='tcrinfo.php'>TCR Info</a></li>";
-						echo "<li><a>Clusters</a></li>";
-					echo "</ul>";
-				echo "</nav>";
-			echo "</header>";
 			// Default query
-			$query = "SELECT pdbID_raw, resolution, tcr_alpha, tcr_beta, peptide, mhc FROM rawPDB";
+			$query = "SELECT percentID, clust, pdbID FROM clustered WHERE percentID=".$percent;
 			$result = mysqli_query($connect, $query);
 			echo "<br>";
 			// Creates header of table
 			echo "<table>";
 				echo "<tr>";
+					echo "<th>Percent Similarity</th>";
+					echo "<th>Cluster #</th>";
 					echo "<th>PDB id</th>";
-					echo "<th>Resolution</th>";
-					echo "<th>Alpha</th>";
-					echo "<th>Beta</th>";
-					echo "<th>Peptide</th>";
-					echo "<th>MHC</th>";
 			// Inserts each row of the table based on query
 			while($row =mysqli_fetch_row($result)) {
 				echo "<tr>";
 					echo "<th>".$row[0]."</th>";
 					echo "<th>".$row[1]."</th>";
 					echo "<th>".$row[2]."</th>";
-					echo "<th>".$row[3]."</th>";
-					echo "<th>".$row[4]."</th>";
-					echo "<th>".$row[5]."</th>";
 				echo "</tr>";
 			}
 			echo "</table>";

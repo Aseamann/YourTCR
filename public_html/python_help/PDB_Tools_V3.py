@@ -1,3 +1,16 @@
+# Name: Austin Seamann
+# EMAIL: aseamann@unomaha.edu
+# Class: BIOI 4870/CSCI 8876, Spring 2021
+#
+# Honor Pledge: On my honor as a student of the University of Neraska at
+# Omaha, I have neither given nor received unauthorized help on
+# this programming assignment.
+#
+# Partners: Some code is based on code provided by Ryan Ehrlich in 2019.
+#           Specifically the get_tcr_chains method which has been further
+#           refined by me.
+#
+# Sources: NONE
 from math import sqrt
 from Bio import pairwise2
 import warnings
